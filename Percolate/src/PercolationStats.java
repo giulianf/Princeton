@@ -66,6 +66,7 @@ public class PercolationStats {
 
     // test client (see below)		
     public static void main(String[] args) {
+        // test
         int n = 2;
         StdOut.println("N : " + n);
         int trials = 100000;
