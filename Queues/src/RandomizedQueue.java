@@ -10,23 +10,20 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
   // construct an empty randomized queue
   public RandomizedQueue() {
-    random = (Item[]) new Object[2];
+    random = (Item[]) new Object[1];
   }
 
   // unit testing (required)
   public static void main(String[] args) {
-    int k = Integer.parseInt(args[0]);
-    String alphabet = "abcdefghijklmn";
-    String elements = alphabet.substring(0, k);
-    String[] elementsArray = elements.split("");
-    RandomizedQueue<String> strs = new RandomizedQueue<String>();
+    RandomizedQueue<Integer> randomizedQueue = new RandomizedQueue<>();
 
-    for (String element : elementsArray) {
-      strs.enqueue(element);
-    }
+    randomizedQueue.enqueue(1);
+    randomizedQueue.enqueue(2);
+    randomizedQueue.enqueue(5);
+    randomizedQueue.enqueue(6);
 
-    for (int i = 0; i < k; i++) {
-      StdOut.println(strs.dequeue());
+    for (int i : randomizedQueue) {
+      System.out.print(" " + i);
     }
   }
 
@@ -83,13 +80,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
   }
 
   private void resize(int capacity) {
-    if (size >= capacity) {
       Item[] copy = (Item[]) new Object[capacity];
       for (int i = 0; i < size; i++) {
         copy[i] = random[i];
       }
       random = copy;
-    }
   }
 
   private int getRandomIndex() {
@@ -101,8 +96,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     private int i;
 
     public RandomArrayIterator() {
-//            copyQueue();
-//            StdRandom.shuffle(r);
+            copyQueue();
+            StdRandom.shuffle(r);
     }
 
     private void copyQueue() {
@@ -121,7 +116,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public Item next() {
-      if (!hasNext()) throw new NoSuchElementException();
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
       return r[i++];
     }
   }
