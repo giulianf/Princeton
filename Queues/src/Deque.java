@@ -19,8 +19,6 @@ public class Deque<Item> implements Iterable<Item> {
 
   // unit testing (required)dequeue
   public static void main(String[] args) {
-    int n = Integer.parseInt(args[0]);
-
     Deque<String> deque = new Deque<>();
 
       deque.addFirst("A");
@@ -33,7 +31,7 @@ public class Deque<Item> implements Iterable<Item> {
       deque.removeFirst();
       deque.removeLast();
 
-      for (Iterator<String> iter = deque.iterator(); iter.hasNext(); ) {
+      for (Iterator<String> iter = deque.iterator(); iter.hasNext();) {
          String deqOut = iter.next();
 
           StdOut.println(deqOut);

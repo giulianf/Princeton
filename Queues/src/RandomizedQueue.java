@@ -1,4 +1,3 @@
-import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 
@@ -7,7 +6,7 @@ import java.util.NoSuchElementException;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
   private Item[] random;
-  private int N;
+  private int size;
 
   // construct an empty randomized queue
   public RandomizedQueue() {
@@ -16,27 +15,29 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
   // unit testing (required)
   public static void main(String[] args) {
-      RandomizedQueue<String> randomizedQueue = new RandomizedQueue<String>();
+    int k = Integer.parseInt(args[0]);
+    String alphabet = "abcdefghijklmn";
+    String elements = alphabet.substring(0, k);
+    String[] elementsArray = elements.split("");
+    RandomizedQueue<String> strs = new RandomizedQueue<String>();
 
-      while (!StdIn.isEmpty()) {
-        String enqueueString = StdIn.readString();
-          randomizedQueue.enqueue(enqueueString);
-      }
+    for (String element : elementsArray) {
+      strs.enqueue(element);
+    }
 
-    int num = Integer.parseInt(args[0]);
-    while(num-- > 0) {
-      StdOut.println(randomizedQueue.dequeue());
+    for (int i = 0; i < k; i++) {
+      StdOut.println(strs.dequeue());
     }
   }
 
   // is the randomized queue empty?
   public boolean isEmpty() {
-    return N == 0;
+    return size == 0;
   }
 
   // return the number of items on the randomized queue
   public int size() {
-    return N;
+    return size;
   }
 
   // add the item
@@ -44,10 +45,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     if (item == null) {
       throw new IllegalArgumentException("Cannot have a null value");
     }
-    if (N == random.length) {
+    if (size == random.length) {
       resize(2 * random.length);
     }
-    random[N++] = item;
+    random[size++] = item;
   }
 
   // remove and return a random item
@@ -57,10 +58,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
     int index = getRandomIndex();
     Item item = random[index];
-    random[index] = random[N - 1];
-    random[N - 1] = null;
-    N--;
-    if (N > 0 && N == random.length / 4) {
+    random[index] = random[size - 1];
+    random[size - 1] = null;
+    size--;
+    if (size > 0 && size == random.length / 4) {
       resize(random.length / 2);
     }
 
@@ -82,9 +83,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
   }
 
   private void resize(int capacity) {
-    if (N >= capacity) {
+    if (size >= capacity) {
       Item[] copy = (Item[]) new Object[capacity];
-      for (int i = 0; i < N; i++) {
+      for (int i = 0; i < size; i++) {
         copy[i] = random[i];
       }
       random = copy;
@@ -92,36 +93,36 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
   }
 
   private int getRandomIndex() {
-    return StdRandom.uniform(0, N);
+    return StdRandom.uniform(0, size);
   }
 
-    private class RandomArrayIterator implements Iterator<Item> {
-        private Item[] r;
-        private int i;
+  private class RandomArrayIterator implements Iterator<Item> {
+    private Item[] r;
+    private int i;
 
-        public RandomArrayIterator() {
+    public RandomArrayIterator() {
 //            copyQueue();
 //            StdRandom.shuffle(r);
-        }
-
-        private void copyQueue() {
-            r = (Item[]) new Object[N];
-            for (int i = 0; i < N; i++) {
-                r[i] = random[i];
-            }
-        }
-
-        public boolean hasNext() {
-            return i < N;
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        public Item next() {
-            if (!hasNext()) throw new NoSuchElementException();
-            return r[i++];
-        }
     }
+
+    private void copyQueue() {
+      r = (Item[]) new Object[size];
+      for (int j = 0; j < size; j++) {
+        r[j] = random[j];
+      }
+    }
+
+    public boolean hasNext() {
+      return i < size;
+    }
+
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
+
+    public Item next() {
+      if (!hasNext()) throw new NoSuchElementException();
+      return r[i++];
+    }
+  }
 }
