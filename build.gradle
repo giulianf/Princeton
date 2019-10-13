@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+allprojects {
+    repositories {
+        maven { url 'https://repo.spring.io/plugins-release' }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src']
+            }
+        }
+    }
+
+    dependencies {
+        implementation 'edu.princeton.cs:algs4:1.0.2'
+
+    }
+}

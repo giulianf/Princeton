@@ -1,0 +1,7 @@
+rootProject.name = 'Princeton'
+include 'Queues'
+include 'Percolate'
+include 'Puzzle'
+include 'Collinear'
+include 'Kd-Trees'
+
