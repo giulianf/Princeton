@@ -4,17 +4,18 @@ public class KdTree {
     private Node root;
     private int size;
 
-    public static void main(String[] args) {
-        KdTree kdtree = new KdTree();
-        Point2D p = new Point2D(0.2, 0.3);
-        kdtree.insert(p);
-        StdOut.println(kdtree.contains(p));
-    }
     /**
      * Construct an empty set of points.
      */
     public KdTree() {
         size = 0;
+    }
+
+    public static void main(String[] args) {
+        KdTree kdtree = new KdTree();
+        Point2D p = new Point2D(0.2, 0.3);
+        kdtree.insert(p);
+        StdOut.println(kdtree.contains(p));
     }
 
     // is the set empty?
@@ -34,13 +35,14 @@ public class KdTree {
         }
         root = insert(root, point2D, true, new double[]{0, 0, 1, 1});
     }
-    private Node insert(Node n, Point2D p, boolean evenLevel, double[] coords) {
-        if (n == null) {
+
+    private Node insert(Node node, Point2D p, boolean evenLevel, double[] coords) {
+        if (node == null) {
             size++;
             return new Node(p, coords);
         }
 
-        double cmp = comparePoints(p, n, evenLevel);
+        double cmp = comparePoints(p, node, evenLevel);
 
         /**
          * Traverse down the BST.
@@ -59,26 +61,26 @@ public class KdTree {
 
         // Handle Nodes which should be inserted to the left
         if (cmp < 0 && evenLevel) {
-            coords[2] = n.point2D.x(); // lessen x_max
-            n.leftNode = insert(n.leftNode, p, !evenLevel, coords);
+            coords[2] = node.getPoint2D().x(); // lessen x_max
+            node.setLeftNode(insert(node.getLeftNode(), p, !evenLevel, coords));
         }
 
         // Handle Nodes which should be inserted to the bottom
         else if (cmp < 0 && !evenLevel) {
-            coords[3] = n.point2D.y(); // lessen y_max
-            n.leftNode = insert(n.leftNode, p, !evenLevel, coords);
+            coords[3] = node.getPoint2D().y(); // lessen y_max
+            node.setLeftNode(insert(node.getLeftNode(), p, !evenLevel, coords));
         }
 
         // Handle Nodes which should be inserted to the right
         else if (cmp > 0 && evenLevel) {
-            coords[0] = n.point2D.x(); // increase x_min
-            n.rightNode = insert(n.rightNode, p, !evenLevel, coords);
+            coords[0] = node.getPoint2D().x(); // increase x_min
+            node.setRightNode(insert(node.getRightNode(), p, !evenLevel, coords));
         }
 
         // Handle Nodes which should be inserted to the top
         else if (cmp > 0 && !evenLevel) {
-            coords[1] = n.point2D.y(); // increase y_min
-            n.rightNode = insert(n.rightNode, p, !evenLevel, coords);
+            coords[1] = node.getPoint2D().y(); // increase y_min
+            node.setRightNode(insert(node.getRightNode(), p, !evenLevel, coords));
         }
 
         /**
@@ -91,8 +93,8 @@ public class KdTree {
          * It is assumed that the RectHV to be created cannot be shrunk
          * at all, and so none of coords[] values are updated here.
          */
-        else if (!n.point2D.equals(p))
-            n.rightNode = insert(n.rightNode, p, !evenLevel, coords);
+        else if (!node.getPoint2D().equals(p))
+            node.setRightNode(insert(node.getRightNode(), p, !evenLevel, coords));
 
         /**
          * Do nothing for a point which is already in the BST.
@@ -101,7 +103,7 @@ public class KdTree {
          * being added.
          */
 
-        return n;
+        return node;
     }
 
     // does the set contain point point2D?
@@ -111,21 +113,22 @@ public class KdTree {
         }
         return contains(root, point2D, true);
     }
-    private boolean contains(Node n, Point2D p, boolean evenLevel) {
+
+    private boolean contains(Node node, Point2D p, boolean evenLevel) {
 
         // Handle reaching the end of the search
-        if (n == null) return false;
+        if (node == null) return false;
 
         // Check whether the search point matches the current Node's point
-        if (n.point2D.equals(p)) return true;
+        if (node.getPoint2D().equals(p)) return true;
 
-        double cmp = comparePoints(p, n, evenLevel);
+        double cmp = comparePoints(p, node, evenLevel);
 
         // Traverse the left path when necessary
-        if (cmp < 0) return contains(n.leftNode, p, !evenLevel);
+        if (cmp < 0) return contains(node.getLeftNode(), p, !evenLevel);
 
             // Traverse the right path when necessary, and as tie-breaker
-        else return contains(n.rightNode, p, !evenLevel);
+        else return contains(node.getRightNode(), p, !evenLevel);
     }
 
     // draw all points to standard draw
@@ -133,30 +136,31 @@ public class KdTree {
         draw(root, true);
     }
 
-    private void draw(Node n, boolean evenLevel) {
-        if (n == null) return;
+    private void draw(Node node, boolean evenLevel) {
+        if (node == null) return;
 
         // Traverse the left Nodes
-        draw(n.leftNode, !evenLevel);
+        draw(node.getLeftNode(), !evenLevel);
 
         // Draw the current Node
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.setPenRadius(0.01);
-        n.point2D.draw();
+        node.getPoint2D().draw();
 
         // Draw the partition line
         StdDraw.setPenRadius();
         if (evenLevel) {
             StdDraw.setPenColor(StdDraw.RED);
-            StdDraw.line(n.point2D.x(), n.rectHV.ymin(), n.point2D.x(), n.rectHV.ymax());
+            StdDraw.line(node.getPoint2D().x(), node.getRectHV().ymin(), node.getPoint2D().x(), node.getRectHV().ymax());
         } else {
             StdDraw.setPenColor(StdDraw.BLUE);
-            StdDraw.line(n.rectHV.xmin(), n.point2D.y(), n.rectHV.xmax(), n.point2D.y());
+            StdDraw.line(node.getRectHV().xmin(), node.getPoint2D().y(), node.getRectHV().xmax(), node.getPoint2D().y());
         }
 
         // Traverse the right Nodes
-        draw(n.rightNode, !evenLevel);
+        draw(node.getRightNode(), !evenLevel);
     }
+
     // all points that are inside the rectangle (or on the boundary)
     public Iterable<Point2D> range(RectHV rectHV) {
         if (rectHV == null) {
@@ -175,7 +179,7 @@ public class KdTree {
             Node tmp = nodes.pop();
 
             // Add contained points to our points stack
-            if (rectHV.contains(tmp.point2D)) points.push(tmp.point2D);
+            if (rectHV.contains(tmp.getPoint2D())) points.push(tmp.getPoint2D());
 
             /**
              * Add Nodes containing promising rectangles to our nodes stack.
@@ -184,11 +188,11 @@ public class KdTree {
              * their rectangles intersect with the given RectHV, we achieve
              * pruning as we traverse the BST.
              */
-            if (tmp.leftNode != null && rectHV.intersects(tmp.leftNode.rectHV)) {
-                nodes.push(tmp.leftNode);
+            if (tmp.getLeftNode() != null && rectHV.intersects(tmp.getLeftNode().getRectHV())) {
+                nodes.push(tmp.getLeftNode());
             }
-            if (tmp.rightNode != null && rectHV.intersects(tmp.rightNode.rectHV)) {
-                nodes.push(tmp.rightNode);
+            if (tmp.getRightNode() != null && rectHV.intersects(tmp.getRightNode().getRectHV())) {
+                nodes.push(tmp.getRightNode());
             }
         }
         return points;
@@ -202,7 +206,7 @@ public class KdTree {
         if (isEmpty()) {
             return null;
         }
-        return nearest(root, point2D, root.point2D, true);
+        return nearest(root, point2D, root.getPoint2D(), true);
     }
 
     private Point2D nearest(Node node, Point2D p, Point2D champion,
@@ -212,11 +216,11 @@ public class KdTree {
         if (node == null) return champion;
 
         // Handle the given point exactly overlapping a point in the BST
-        if (node.point2D.equals(p)) return p;
+        if (node.getPoint2D().equals(p)) return p;
 
         // Determine if the current Node's point beats the existing champion
-        if (node.point2D.distanceSquaredTo(p) < champion.distanceSquaredTo(p))
-            champion = node.point2D;
+        if (node.getPoint2D().distanceSquaredTo(p) < champion.distanceSquaredTo(p))
+            champion = node.getPoint2D();
 
         /**
          * Calculate the distance from the search point to the current
@@ -239,12 +243,12 @@ public class KdTree {
          * the current Node's point.
          */
         if (toPartitionLine < 0) {
-            champion = nearest(node.leftNode, p, champion, !evenLevel);
+            champion = nearest(node.getLeftNode(), p, champion, !evenLevel);
 
             // Since champion may have changed, recalculate distance
             if (champion.distanceSquaredTo(p) >=
                     toPartitionLine * toPartitionLine) {
-                champion = nearest(node.rightNode, p, champion, !evenLevel);
+                champion = nearest(node.getRightNode(), p, champion, !evenLevel);
             }
         }
 
@@ -259,12 +263,12 @@ public class KdTree {
          * the level of the current Node).
          */
         else {
-            champion = nearest(node.rightNode, p, champion, !evenLevel);
+            champion = nearest(node.getRightNode(), p, champion, !evenLevel);
 
             // Since champion may have changed, recalculate distance
             if (champion.distanceSquaredTo(p) >=
                     toPartitionLine * toPartitionLine) {
-                champion = nearest(node.leftNode, p, champion, !evenLevel);
+                champion = nearest(node.getLeftNode(), p, champion, !evenLevel);
             }
         }
 
@@ -273,30 +277,54 @@ public class KdTree {
 
     private double comparePoints(Point2D point2D, Node node, boolean evenLevel) {
         if (evenLevel) {
-            return point2D.x() - node.point2D.x();
-        } else return point2D.y() - node.point2D.y();
+            return point2D.x() - node.getPoint2D().x();
+        } else return point2D.y() - node.getPoint2D().y();
     }
 
     /**
      * The data structure from which a KdTree is created.
      */
-    private static class Node {
+    private class Node {
 
         // the point
-        public final Point2D point2D;
+        private Point2D point2D;
 
         // the axis-aligned rectangle corresponding to this node
-        public final RectHV rectHV;
+        private RectHV rectHV;
 
         // the left/bottom subtree
-        public Node leftNode;
+        private Node leftNode;
 
         // the right/top subtree
-        public Node rightNode;
+        private Node rightNode;
 
-        private Node(Point2D point2D, double[] coords) {
+        public Node(Point2D point2D, double[] coords) {
             this.point2D = point2D;
             rectHV = new RectHV(coords[0], coords[1], coords[2], coords[3]);
+        }
+
+        public Point2D getPoint2D() {
+            return point2D;
+        }
+
+        public RectHV getRectHV() {
+            return rectHV;
+        }
+
+        public Node getLeftNode() {
+            return leftNode;
+        }
+
+        public void setLeftNode(Node leftNode) {
+            this.leftNode = leftNode;
+        }
+
+        public Node getRightNode() {
+            return rightNode;
+        }
+
+        public void setRightNode(Node rightNode) {
+            this.rightNode = rightNode;
         }
     }
 }

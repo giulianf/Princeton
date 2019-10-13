@@ -4,7 +4,7 @@ import edu.princeton.cs.algs4.SET;
 import edu.princeton.cs.algs4.Stack;
 
 public class PointSET {
-    private SET<Point2D> setPoints;
+    final private SET<Point2D> setPoints;
 
     // construct an empty set of points
     public PointSET() {
@@ -76,11 +76,11 @@ public class PointSET {
 
         // Initialize loop variables
         Point2D closestPoint = null; // null initialization required by Java?
-        double closestDistance = Double.MAX_VALUE;
+        double closestDistance = Double.POSITIVE_INFINITY;
 
         // Touch every point to see which is the closest to the given point point2D
         for (Point2D point : setPoints) {
-            double currentDistance = point2D.distanceTo(point);
+            double currentDistance = point2D.distanceSquaredTo(point);
             if (currentDistance < closestDistance) {
                 closestDistance = currentDistance;
                 closestPoint = point;
