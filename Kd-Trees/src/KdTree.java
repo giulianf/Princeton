@@ -1,12 +1,15 @@
-import edu.princeton.cs.algs4.Point2D;
-import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.Stack;
-import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.*;
 
 public class KdTree {
     private Node root;
     private int size;
 
+    public static void main(String[] args) {
+        KdTree kdtree = new KdTree();
+        Point2D p = new Point2D(0.2, 0.3);
+        kdtree.insert(p);
+        StdOut.println(kdtree.contains(p));
+    }
     /**
      * Construct an empty set of points.
      */
@@ -31,7 +34,6 @@ public class KdTree {
         }
         root = insert(root, point2D, true, new double[]{0, 0, 1, 1});
     }
-
     private Node insert(Node n, Point2D p, boolean evenLevel, double[] coords) {
         if (n == null) {
             size++;
@@ -109,7 +111,6 @@ public class KdTree {
         }
         return contains(root, point2D, true);
     }
-
     private boolean contains(Node n, Point2D p, boolean evenLevel) {
 
         // Handle reaching the end of the search
@@ -156,7 +157,6 @@ public class KdTree {
         // Traverse the right Nodes
         draw(n.rightNode, !evenLevel);
     }
-
     // all points that are inside the rectangle (or on the boundary)
     public Iterable<Point2D> range(RectHV rectHV) {
         if (rectHV == null) {
@@ -205,18 +205,18 @@ public class KdTree {
         return nearest(root, point2D, root.point2D, true);
     }
 
-    private Point2D nearest(Node n, Point2D p, Point2D champion,
+    private Point2D nearest(Node node, Point2D p, Point2D champion,
                             boolean evenLevel) {
 
         // Handle reaching the end of the tree
-        if (n == null) return champion;
+        if (node == null) return champion;
 
         // Handle the given point exactly overlapping a point in the BST
-        if (n.point2D.equals(p)) return p;
+        if (node.point2D.equals(p)) return p;
 
         // Determine if the current Node's point beats the existing champion
-        if (n.point2D.distanceSquaredTo(p) < champion.distanceSquaredTo(p))
-            champion = n.point2D;
+        if (node.point2D.distanceSquaredTo(p) < champion.distanceSquaredTo(p))
+            champion = node.point2D;
 
         /**
          * Calculate the distance from the search point to the current
@@ -232,19 +232,19 @@ public class KdTree {
          * of the points on the other side of that partition line, because none
          * can be closer.
          */
-        double toPartitionLine = comparePoints(p, n, evenLevel);
+        double toPartitionLine = comparePoints(p, node, evenLevel);
 
         /**
          * Handle the search point being to the left of or below
          * the current Node's point.
          */
         if (toPartitionLine < 0) {
-            champion = nearest(n.leftNode, p, champion, !evenLevel);
+            champion = nearest(node.leftNode, p, champion, !evenLevel);
 
             // Since champion may have changed, recalculate distance
             if (champion.distanceSquaredTo(p) >=
                     toPartitionLine * toPartitionLine) {
-                champion = nearest(n.rightNode, p, champion, !evenLevel);
+                champion = nearest(node.rightNode, p, champion, !evenLevel);
             }
         }
 
@@ -259,40 +259,40 @@ public class KdTree {
          * the level of the current Node).
          */
         else {
-            champion = nearest(n.rightNode, p, champion, !evenLevel);
+            champion = nearest(node.rightNode, p, champion, !evenLevel);
 
             // Since champion may have changed, recalculate distance
             if (champion.distanceSquaredTo(p) >=
                     toPartitionLine * toPartitionLine) {
-                champion = nearest(n.leftNode, p, champion, !evenLevel);
+                champion = nearest(node.leftNode, p, champion, !evenLevel);
             }
         }
 
         return champion;
     }
 
-    private double comparePoints(Point2D p, Node n, boolean evenLevel) {
+    private double comparePoints(Point2D point2D, Node node, boolean evenLevel) {
         if (evenLevel) {
-            return p.x() - n.point2D.x();
-        } else return p.y() - n.point2D.y();
+            return point2D.x() - node.point2D.x();
+        } else return point2D.y() - node.point2D.y();
     }
 
     /**
      * The data structure from which a KdTree is created.
      */
-    private class Node {
+    private static class Node {
 
         // the point
-        private final Point2D point2D;
+        public final Point2D point2D;
 
         // the axis-aligned rectangle corresponding to this node
-        private final RectHV rectHV;
+        public final RectHV rectHV;
 
         // the left/bottom subtree
-        private Node leftNode;
+        public Node leftNode;
 
         // the right/top subtree
-        private Node rightNode;
+        public Node rightNode;
 
         private Node(Point2D point2D, double[] coords) {
             this.point2D = point2D;
